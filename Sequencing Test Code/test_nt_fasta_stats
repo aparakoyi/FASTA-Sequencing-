@@ -1,0 +1,90 @@
+"""Test suite for nt_fasta_stats.py"""
+import os
+import pytest
+
+
+from nt_fasta_stats import (get_filehandle, get_fasta_lists, _verify_lists)
+
+# ignore all "Missing function or method docstring" since this is a unit test
+# pylint: disable=C0116
+# ignore all "Function name "test_get_filehandle_4_OSError
+# " doesn't conform to snake_case naming style"
+# pylint: disable=C0103
+
+FILE_TO_TEST = "test_file.txt"
+FILE_TO_TEST_PARSING = "test_file.fasta"
+FASTA_STR_TO_TEST = """\
+>TEST1 A/TEST/TEST/2006 2006// 4 (HA)
+AACAGCACGGCAACGCTGTGCCTTGGGCACCATGCAGTACCAAACGGAACGATAGTGAAAACAATCACGA
+ATGACCAAATTGAAGTTACTAATGCTACTGAGCTGGTTCAGAGTTCCTCAACAGGTGAAATATGCGACAG
+TCCTCATCAGATCCTTGATGGAGAAAACTGCACACTAATAGATGCTCTATTGGGAGACCCTCAGTGTGAT
+GGCTTCCAAAATAAGAAATGGGACCTTTTTGTTGAACGCAGCAAAGCCTACAGCAACTGTTACCCTTATG
+ATGTGCCGGATTATGCCTCCCTTAGGTCACTAGTTGCCTCATCCGGCACACTGGAATTTAACAATGAAAG
+>TEST A/TEST/TEST/2006 2006// 4 (HA)
+ATAAAAGCAACCAAAATGAAAGTAAAACTACTGGTTCTGTTATGTACATTTACAGCTACATATGCAGACA
+CAATATGTATAGGCTACCATGCCAACAATTCAACCGACACTGTTGACACAGTACTTGAGAAGAATGTGAC
+AGTGACACACTCTGTCAACCTACTTGAGGACAGTCACAATGGAAAACTATGTCTACTAAAAGGAATAGCC
+CCACTACAATTGGGTAATTGCAGCGTTGCCGGATGGATCTTAGGAAACCCAGAATGCGAATTACTGATTT
+CCAAGGAATCATGGTCCTACATTGTGGAAATACCAAATCCTGAGAATGGAACATGTTACCCAGGGTATTT
+CGCCGACTATGAGGAGCTGAGGGAGCAATTGAGTTCAGTATCTTCATTTGAGAGGTTCGAAATATTCCCC
+"""
+
+
+def test_existing_get_filehandle_for_reading():
+    # does it open a file for reading
+    # create a test file
+    _create_file_for_testing(FILE_TO_TEST)
+    # test
+    test = get_filehandle(FILE_TO_TEST, "r")
+    assert hasattr(test, "readline") is True, "Not able to open for reading"
+    test.close()
+    os.remove(FILE_TO_TEST)
+
+
+def _create_file_for_testing(file):
+    open(file, "r").close()
+
+
+def test_existing_get_filehandle_for_writing():
+    _create_file_for_testing_writing(FILE_TO_TEST)
+    test = get_filehandle(FILE_TO_TEST)
+    assert hasattr(test, "write") is True, "Not able to open for writing"
+    test.close()
+    os.remove(FILE_TO_TEST)
+
+
+def _create_file_for_testing_writing(file):
+    open(file, "w").close()
+
+
+def test_get_filehandle_4_OSError():
+    # does it raise OSError
+    # this should exit
+    with pytest.raises(OSError):
+        get_filehandle("does_not_exist.txt", "r")
+
+
+def test_get_filehandle_4_ValueError():
+    # does it raise OSError
+    # this should exit
+    with pytest.raises(ValueError):
+        get_filehandle(FILE_TO_TEST, "rrrr")
+
+
+def test_get_fasta_lists():
+    # is it able to parse through a file
+    _create_fasta_file_for_testing()
+    test = get_fasta_lists(FILE_TO_TEST_PARSING)
+    print(test)
+
+
+def _create_fasta_file_for_testing():
+    with open(FILE_TO_TEST_PARSING, "w") as fh:
+        fh.write(FASTA_STR_TO_TEST)
+        fh.close()
+
+
+def test__verify_lists():
+    _create_fasta_file_for_testing()
+    test = _verify_lists(list_headers=[275628, 364821764, 3789173], list_seqs=['Adeyagedyiq'])
+    print(test)
