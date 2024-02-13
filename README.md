@@ -2,7 +2,7 @@
 ## Abigail Parakoyi 
 
 # Overview 
-
+This project focuses on 
 # Description
 
 ## Getting Started
