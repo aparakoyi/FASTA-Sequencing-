@@ -1,4 +1,4 @@
-# FASTA-Sequencing
+# FASTA Sequencing for GC%, Protein and Secondary Structure Count
 ## Abigail Parakoyi 
 
 # Overview 
